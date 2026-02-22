@@ -1,0 +1,88 @@
+{% load i18n %}
+{% load djicons %}
+
+<div class="p-4">
+    <div class="card" style="max-width: 640px;">
+        <div class="card-header">
+            <h2 class="card-title">{% icon "link-outline" css_class="text-primary" %} {% trans "Create Payment Link" %}</h2>
+            <p class="card-subtitle">{% trans "Create a shareable link for your customer to make a payment." %}</p>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{% url 'online_payments:payment_link_create' %}"
+                hx-post="{% url 'online_payments:payment_link_create' %}"
+                hx-target="#main-content-area">
+                {% csrf_token %}
+
+                <div class="space-y-4">
+                    <!-- Title -->
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Title" %} *</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                        <p class="text-sm text-error mt-1">{{ form.title.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Description" %}</label>
+                        {{ form.description }}
+                    </div>
+
+                    <!-- Amount & Currency -->
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="form-group col-span-2">
+                            <label class="form-group-label">{% trans "Amount" %} *</label>
+                            {{ form.amount }}
+                            {% if form.amount.errors %}
+                            <p class="text-sm text-error mt-1">{{ form.amount.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-group-label">{% trans "Currency" %}</label>
+                            {{ form.currency }}
+                        </div>
+                    </div>
+
+                    <!-- Customer Email -->
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Customer Email" %}</label>
+                        {{ form.customer_email }}
+                        <p class="text-xs text-muted mt-1">{% trans "Optional. Pre-fill the customer email on checkout." %}</p>
+                    </div>
+
+                    <!-- Expiry -->
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Expires At" %}</label>
+                        {{ form.expires_at }}
+                        <p class="text-xs text-muted mt-1">{% trans "Optional. Leave empty for no expiration." %}</p>
+                    </div>
+
+                    <!-- Max Uses -->
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Max Uses" %}</label>
+                        {{ form.max_uses }}
+                        <p class="text-xs text-muted mt-1">{% trans "Set to 0 for unlimited uses." %}</p>
+                    </div>
+
+                    <!-- Hidden fields -->
+                    {{ form.source_type }}
+                    {{ form.source_id }}
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3 mt-6">
+                    <button type="submit" class="btn color-primary">
+                        {% icon "checkmark-outline" %} {% trans "Create Payment Link" %}
+                    </button>
+                    <button type="button" class="btn btn-outline"
+                        hx-get="{% url 'online_payments:payment_links' %}"
+                        hx-target="#main-content-area"
+                        hx-push-url="true">
+                        {% trans "Cancel" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

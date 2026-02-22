@@ -1,0 +1,231 @@
+{% load i18n %}
+{% load djicons %}
+
+<script>
+function onlinePaymentsSettingsApp() {
+    return {
+        activeGateway: '{{ config.active_gateway }}',
+        saving: false,
+
+        init() {
+            console.log('[OnlinePayments Settings] Initialized, gateway:', this.activeGateway);
+        },
+
+        async saveSettings() {
+            this.saving = true;
+
+            const form = this.$refs.settingsForm;
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => { data[key] = value; });
+
+            // Ensure boolean fields are set
+            data.require_deposit = form.querySelector('[name=require_deposit]')?.checked || false;
+
+            try {
+                const response = await fetch('{% url "online_payments:settings_save" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    this.showToast('{% trans "Settings saved" %}', 'success');
+                } else {
+                    throw new Error(result.error || '{% trans "Error saving settings" %}');
+                }
+            } catch (error) {
+                console.error('[OnlinePayments Settings] Error:', error);
+                this.showToast(error.message || '{% trans "Error saving settings" %}', 'error');
+            } finally {
+                this.saving = false;
+            }
+        },
+
+        showToast(message, type = 'primary') {
+            if (window.UX && window.UX.toast) {
+                window.UX.toast(message, { type: type });
+            } else {
+                console.log('[Toast]', type, message);
+            }
+        }
+    }
+}
+</script>
+
+{% csrf_token %}
+<div x-data="onlinePaymentsSettingsApp()" x-init="init()" class="p-4">
+
+    <form x-ref="settingsForm" @submit.prevent="saveSettings()">
+        <!-- Gateway Selection -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">{% icon "card-outline" css_class="text-primary" %} {% trans "Payment Gateway" %}</h3>
+                <p class="card-subtitle">{% trans "Select and configure your payment provider" %}</p>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Active Gateway" %}</label>
+                    <select name="active_gateway" class="select" x-model="activeGateway">
+                        <option value="none">{% trans "None (disabled)" %}</option>
+                        <option value="stripe">Stripe</option>
+                        <option value="redsys">Redsys ({% trans "Spain" %})</option>
+                        <option value="manual">{% trans "Manual" %}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stripe Configuration -->
+        <div class="card mb-4" x-show="activeGateway === 'stripe'" x-transition>
+            <div class="card-header">
+                <h3 class="card-title">{% icon "logo-stripe" css_class="text-primary" %} {% trans "Stripe Configuration" %}</h3>
+            </div>
+            <div class="card-body space-y-4">
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Public Key" %}</label>
+                    <input type="text" name="stripe_public_key" class="input"
+                        value="{{ config.stripe_public_key }}"
+                        placeholder="pk_live_...">
+                </div>
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Secret Key" %}</label>
+                    <input type="password" name="stripe_secret_key" class="input"
+                        placeholder="{% if config.stripe_secret_key %}********{% else %}sk_live_...{% endif %}"
+                        autocomplete="off">
+                    <p class="text-xs text-muted mt-1">{% trans "Leave empty to keep current value" %}</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Webhook Secret" %}</label>
+                    <input type="password" name="stripe_webhook_secret" class="input"
+                        placeholder="{% if config.stripe_webhook_secret %}********{% else %}whsec_...{% endif %}"
+                        autocomplete="off">
+                    <p class="text-xs text-muted mt-1">{% trans "Leave empty to keep current value" %}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Redsys Configuration -->
+        <div class="card mb-4" x-show="activeGateway === 'redsys'" x-transition>
+            <div class="card-header">
+                <h3 class="card-title">{% icon "business-outline" css_class="text-primary" %} {% trans "Redsys Configuration" %}</h3>
+            </div>
+            <div class="card-body space-y-4">
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Merchant Code" %}</label>
+                    <input type="text" name="redsys_merchant_code" class="input"
+                        value="{{ config.redsys_merchant_code }}"
+                        placeholder="{% trans 'Merchant code' %}">
+                </div>
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Secret Key" %}</label>
+                    <input type="password" name="redsys_secret_key" class="input"
+                        placeholder="{% if config.redsys_secret_key %}********{% else %}{% trans 'Secret key' %}{% endif %}"
+                        autocomplete="off">
+                    <p class="text-xs text-muted mt-1">{% trans "Leave empty to keep current value" %}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Terminal" %}</label>
+                        <input type="text" name="redsys_terminal" class="input"
+                            value="{{ config.redsys_terminal }}" placeholder="001">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Environment" %}</label>
+                        <select name="redsys_environment" class="select">
+                            <option value="test" {% if config.redsys_environment == 'test' %}selected{% endif %}>{% trans "Test" %}</option>
+                            <option value="production" {% if config.redsys_environment == 'production' %}selected{% endif %}>{% trans "Production" %}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- General Settings -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">{% icon "settings-outline" css_class="text-success" %} {% trans "General Settings" %}</h3>
+            </div>
+            <div class="card-body space-y-4">
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Currency" %}</label>
+                    <input type="text" name="currency" class="input" style="width: 120px;"
+                        value="{{ config.currency }}" placeholder="EUR" maxlength="3">
+                </div>
+
+                <div class="list">
+                    <div class="list-item">
+                        <div class="list-item-content">
+                            <div class="list-item-label">{% trans "Require Deposit" %}</div>
+                            <div class="list-item-note">{% trans "Require a deposit for appointments and orders" %}</div>
+                        </div>
+                        <div class="list-item-end">
+                            <label class="toggle color-success">
+                                <input type="checkbox" name="require_deposit"
+                                    {% if config.require_deposit %}checked{% endif %}>
+                                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Deposit Percentage" %}</label>
+                    <input type="number" name="deposit_percentage" class="input" style="width: 160px;"
+                        value="{{ config.deposit_percentage }}"
+                        min="0" max="100" step="0.01">
+                    <p class="text-xs text-muted mt-1">{% trans "Percentage of total to collect as deposit" %}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- URLs -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">{% icon "globe-outline" css_class="text-primary" %} {% trans "Redirect URLs" %}</h3>
+            </div>
+            <div class="card-body space-y-4">
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Success URL" %}</label>
+                    <input type="url" name="success_url" class="input"
+                        value="{{ config.success_url }}" placeholder="https://">
+                    <p class="text-xs text-muted mt-1">{% trans "Redirect after successful payment" %}</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Cancel URL" %}</label>
+                    <input type="url" name="cancel_url" class="input"
+                        value="{{ config.cancel_url }}" placeholder="https://">
+                    <p class="text-xs text-muted mt-1">{% trans "Redirect after cancelled payment" %}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">{% icon "notifications-outline" css_class="text-warning" %} {% trans "Notifications" %}</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Notification Email" %}</label>
+                    <input type="email" name="notification_email" class="input"
+                        value="{{ config.notification_email }}" placeholder="email@example.com">
+                    <p class="text-xs text-muted mt-1">{% trans "Receive email notifications for payment events" %}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="flex items-center gap-3">
+            <button type="submit" class="btn color-primary" :disabled="saving">
+                <span x-show="!saving">{% icon "save-outline" %} {% trans "Save Settings" %}</span>
+                <span x-show="saving" class="loading loading-sm"></span>
+            </button>
+        </div>
+    </form>
+</div>

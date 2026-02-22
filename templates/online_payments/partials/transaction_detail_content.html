@@ -1,0 +1,197 @@
+{% load i18n %}
+{% load djicons %}
+
+<div class="p-4" x-data="{ showRefundModal: false, refundAmount: '', refunding: false }">
+    <!-- Transaction Header Card -->
+    <div class="card">
+        <div class="card-header">
+            <div class="flex justify-between items-center">
+                <h2 class="card-title">{% trans "Transaction" %} {{ transaction.transaction_id }}</h2>
+                <span class="badge {% if transaction.status == 'completed' %}color-success{% elif transaction.status == 'failed' %}color-error{% elif transaction.status == 'pending' %}color-warning{% elif transaction.status == 'refunded' %}color-error{% else %}color-primary{% endif %}">
+                    {{ transaction.get_status_display }}
+                </span>
+            </div>
+            <p class="text-sm opacity-60">
+                {{ transaction.created_at|date:"d/m/Y H:i:s" }}
+            </p>
+        </div>
+
+        <div class="card-body">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Amount -->
+                <div>
+                    <span class="text-muted text-sm">{% trans "Amount" %}</span>
+                    <p class="text-2xl font-bold text-primary mt-1">{{ transaction.amount|floatformat:2 }} {{ transaction.currency }}</p>
+                </div>
+
+                <!-- Gateway -->
+                <div>
+                    <span class="text-muted text-sm">{% trans "Gateway" %}</span>
+                    <p class="font-medium mt-1">
+                        <span class="badge">{{ transaction.gateway }}</span>
+                        {% if transaction.payment_method_type %}
+                        <span class="badge badge-sm ml-1">{{ transaction.payment_method_type }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Customer -->
+                <div>
+                    <span class="text-muted text-sm">{% trans "Customer" %}</span>
+                    <p class="font-medium mt-1">
+                        {% if transaction.customer_name %}
+                            {{ transaction.customer_name }}
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </p>
+                    {% if transaction.customer_email %}
+                    <p class="text-sm text-muted">{{ transaction.customer_email }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Gateway Reference -->
+                <div>
+                    <span class="text-muted text-sm">{% trans "Gateway Reference" %}</span>
+                    <p class="font-mono text-sm mt-1">{{ transaction.gateway_reference|default:"-" }}</p>
+                </div>
+
+                <!-- Description -->
+                {% if transaction.description %}
+                <div class="col-span-2">
+                    <span class="text-muted text-sm">{% trans "Description" %}</span>
+                    <p class="mt-1">{{ transaction.description }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Source -->
+                {% if transaction.source_type %}
+                <div>
+                    <span class="text-muted text-sm">{% trans "Source" %}</span>
+                    <p class="font-medium mt-1">{{ transaction.source_type }}{% if transaction.source_id %}: {{ transaction.source_id }}{% endif %}</p>
+                </div>
+                {% endif %}
+
+                <!-- Completed At -->
+                {% if transaction.completed_at %}
+                <div>
+                    <span class="text-muted text-sm">{% trans "Completed At" %}</span>
+                    <p class="font-medium mt-1">{{ transaction.completed_at|date:"d/m/Y H:i:s" }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Error Message -->
+                {% if transaction.error_message %}
+                <div class="col-span-2">
+                    <span class="text-muted text-sm">{% trans "Error" %}</span>
+                    <div class="callout callout-error mt-1">
+                        <div class="callout-icon">{% icon "alert-circle-outline" %}</div>
+                        <div class="callout-content">
+                            <div class="callout-text">{{ transaction.error_message }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Refund Info -->
+    {% if transaction.refund_amount > 0 %}
+    <div class="card mt-4">
+        <div class="card-header">
+            <h3 class="card-title text-error">{% icon "return-down-back-outline" %} {% trans "Refund Details" %}</h3>
+        </div>
+        <div class="card-body">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <span class="text-muted text-sm">{% trans "Refunded Amount" %}</span>
+                    <p class="text-lg font-semibold text-error mt-1">{{ transaction.refund_amount|floatformat:2 }} {{ transaction.currency }}</p>
+                </div>
+                <div>
+                    <span class="text-muted text-sm">{% trans "Refunded At" %}</span>
+                    <p class="font-medium mt-1">{{ transaction.refunded_at|date:"d/m/Y H:i" }}</p>
+                </div>
+                <div>
+                    <span class="text-muted text-sm">{% trans "Remaining" %}</span>
+                    {% with remaining=transaction.amount|add:"-"|add:transaction.refund_amount %}
+                    <p class="font-medium mt-1">{{ transaction.amount|floatformat:2 }} - {{ transaction.refund_amount|floatformat:2 }} {{ transaction.currency }}</p>
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="flex gap-3 mt-4">
+        <button
+            class="btn btn-outline"
+            hx-get="{% url 'online_payments:transactions' %}"
+            hx-target="#main-content-area"
+            hx-push-url="true">
+            {% icon "arrow-back-outline" css_class="mr-2" %}
+            {% trans "Back to Transactions" %}
+        </button>
+
+        {% if transaction.status == 'completed' or transaction.status == 'partially_refunded' %}
+        <button
+            class="btn btn-outline color-error"
+            @click="showRefundModal = true; refundAmount = '{{ transaction.amount }}'">
+            {% icon "return-down-back-outline" css_class="mr-2" %}
+            {% trans "Refund" %}
+        </button>
+        {% endif %}
+    </div>
+
+    <!-- Refund Modal -->
+    <div class="modal-backdrop" :data-state="showRefundModal ? 'open' : 'closed'" @click.self="showRefundModal = false">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">{% trans "Process Refund" %}</h3>
+                <button class="modal-close" @click="showRefundModal = false">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-4">{% trans "Enter the amount to refund for transaction" %} <strong>{{ transaction.transaction_id }}</strong>.</p>
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Refund Amount" %} ({{ transaction.currency }})</label>
+                    <input type="number" class="input" x-model="refundAmount"
+                        min="0.01" max="{{ transaction.amount }}" step="0.01">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" @click="showRefundModal = false">{% trans "Cancel" %}</button>
+                <button class="btn color-error"
+                    :disabled="refunding"
+                    @click="
+                        refunding = true;
+                        fetch('{% url 'online_payments:refund' transaction.pk %}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                            },
+                            body: JSON.stringify({ amount: parseFloat(refundAmount) })
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                if (window.UX && window.UX.toast) window.UX.toast('{% trans "Refund processed" %}', { type: 'success' });
+                                showRefundModal = false;
+                                htmx.ajax('GET', window.location.href, { target: '#main-content-area' });
+                            } else {
+                                if (window.UX && window.UX.toast) window.UX.toast(data.error, { type: 'error' });
+                            }
+                            refunding = false;
+                        })
+                        .catch(() => { refunding = false; })
+                    ">
+                    <span x-show="!refunding">{% icon "return-down-back-outline" %} {% trans "Process Refund" %}</span>
+                    <span x-show="refunding" class="loading loading-sm"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {% csrf_token %}
+</div>

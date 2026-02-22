@@ -1,0 +1,123 @@
+{% load i18n %}
+{% load djicons %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ link.title }} - {% trans "Payment" %}</title>
+    <link rel="stylesheet" href="/static/css/ux-full.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-base-200);
+            padding: 1rem;
+        }
+        .checkout-container {
+            width: 100%;
+            max-width: 480px;
+        }
+    </style>
+</head>
+<body>
+    <div class="checkout-container" x-data="{ processing: false, error: '' }">
+        <div class="card">
+            <div class="card-header text-center">
+                <h1 class="card-title text-xl">{{ link.title }}</h1>
+                {% if link.description %}
+                <p class="text-muted mt-2">{{ link.description }}</p>
+                {% endif %}
+            </div>
+
+            <div class="card-body text-center">
+                <div class="text-4xl font-bold text-primary mb-6">
+                    {{ link.amount|floatformat:2 }} {{ link.currency }}
+                </div>
+
+                {% if link.customer_email %}
+                <div class="text-sm text-muted mb-4">
+                    {% icon "mail-outline" %} {{ link.customer_email }}
+                </div>
+                {% endif %}
+
+                {% if gateway_settings.active_gateway == 'stripe' %}
+                <button class="btn color-primary btn-lg btn-block"
+                    :disabled="processing"
+                    @click="
+                        processing = true;
+                        error = '';
+                        fetch('{% url 'online_payments:api_create_session' %}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                amount: {{ link.amount }},
+                                currency: '{{ link.currency }}',
+                                description: '{{ link.title|escapejs }}',
+                                customer_email: '{{ link.customer_email|escapejs }}',
+                                payment_link_slug: '{{ link.slug }}',
+                                source_type: '{{ link.source_type }}',
+                                source_id: '{{ link.source_id|default_if_none:'' }}'
+                            })
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                // In production, redirect to Stripe Checkout
+                                error = '';
+                            } else {
+                                error = data.error;
+                            }
+                            processing = false;
+                        })
+                        .catch(e => { error = e.message; processing = false; })
+                    ">
+                    <span x-show="!processing">{% icon "card-outline" %} {% trans "Pay with Stripe" %}</span>
+                    <span x-show="processing" class="loading loading-sm"></span>
+                </button>
+                {% elif gateway_settings.active_gateway == 'redsys' %}
+                <button class="btn color-primary btn-lg btn-block"
+                    :disabled="processing"
+                    @click="processing = true">
+                    <span x-show="!processing">{% icon "card-outline" %} {% trans "Pay with Card" %}</span>
+                    <span x-show="processing" class="loading loading-sm"></span>
+                </button>
+                {% elif gateway_settings.active_gateway == 'manual' %}
+                <div class="callout callout-info mb-4">
+                    <div class="callout-icon">{% icon "information-circle-outline" %}</div>
+                    <div class="callout-content">
+                        <div class="callout-title">{% trans "Manual Payment" %}</div>
+                        <div class="callout-text">{% trans "Please contact the business to arrange payment." %}</div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="callout callout-warning">
+                    <div class="callout-icon">{% icon "warning-outline" %}</div>
+                    <div class="callout-content">
+                        <div class="callout-title">{% trans "Payment Unavailable" %}</div>
+                        <div class="callout-text">{% trans "Online payments are not currently configured." %}</div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Error display -->
+                <template x-if="error">
+                    <div class="callout callout-error mt-4">
+                        <div class="callout-icon">{% icon "alert-circle-outline" %}</div>
+                        <div class="callout-content">
+                            <div class="callout-text" x-text="error"></div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <div class="card-body border-t border-base-200 text-center text-xs text-muted">
+                {% trans "Secure payment processing" %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

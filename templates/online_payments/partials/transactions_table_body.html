@@ -1,0 +1,94 @@
+{% load i18n %}
+{% load djicons %}
+
+{% if transactions %}
+<div class="overflow-x-auto">
+    <table class="table w-full">
+        <thead class="table-head">
+            <tr>
+                <th class="table-th">{% trans "Transaction ID" %}</th>
+                <th class="table-th">{% trans "Customer" %}</th>
+                <th class="table-th">{% trans "Gateway" %}</th>
+                <th class="table-th text-right">{% trans "Amount" %}</th>
+                <th class="table-th text-center">{% trans "Status" %}</th>
+                <th class="table-th">{% trans "Date" %}</th>
+                <th class="table-th text-center">{% trans "Actions" %}</th>
+            </tr>
+        </thead>
+        <tbody class="table-body">
+            {% for txn in transactions %}
+            <tr class="table-row cursor-pointer"
+                hx-get="{% url 'online_payments:transaction_detail' txn.pk %}"
+                hx-target="#main-content-area"
+                hx-push-url="true">
+                <td class="table-td">
+                    <span class="font-mono text-sm">{{ txn.transaction_id }}</span>
+                </td>
+                <td class="table-td">
+                    <div>{{ txn.customer_name|default:"-" }}</div>
+                    {% if txn.customer_email %}
+                    <div class="text-xs text-muted">{{ txn.customer_email }}</div>
+                    {% endif %}
+                </td>
+                <td class="table-td">
+                    <span class="badge badge-sm">{{ txn.gateway }}</span>
+                </td>
+                <td class="table-td text-right font-semibold">
+                    {{ txn.amount|floatformat:2 }} {{ txn.currency }}
+                </td>
+                <td class="table-td text-center">
+                    <span class="badge badge-sm {% if txn.status == 'completed' %}color-success{% elif txn.status == 'failed' %}color-error{% elif txn.status == 'pending' %}color-warning{% elif txn.status == 'refunded' %}color-error{% elif txn.status == 'partially_refunded' %}color-warning{% else %}color-primary{% endif %}">
+                        {{ txn.get_status_display }}
+                    </span>
+                </td>
+                <td class="table-td text-sm text-muted">
+                    {{ txn.created_at|date:"d/m/Y H:i" }}
+                </td>
+                <td class="table-td text-center" onclick="event.stopPropagation()">
+                    <button class="btn btn-ghost btn-sm"
+                        hx-get="{% url 'online_payments:transaction_detail' txn.pk %}"
+                        hx-target="#main-content-area"
+                        hx-push-url="true">
+                        {% icon "eye-outline" %}
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="flex justify-center items-center gap-2 p-4">
+    {% if page_obj.has_previous %}
+    <button class="btn btn-sm btn-outline"
+        hx-get="{% url 'online_payments:transactions' %}?page={{ page_obj.previous_page_number }}&search={{ search }}&status={{ status_filter }}&gateway={{ gateway_filter }}"
+        hx-target="#transactions-table-container">
+        {% icon "chevron-back-outline" %}
+    </button>
+    {% endif %}
+
+    <span class="text-sm text-muted">
+        {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+    <button class="btn btn-sm btn-outline"
+        hx-get="{% url 'online_payments:transactions' %}?page={{ page_obj.next_page_number }}&search={{ search }}&status={{ status_filter }}&gateway={{ gateway_filter }}"
+        hx-target="#transactions-table-container">
+        {% icon "chevron-forward-outline" %}
+    </button>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="text-center py-12 text-muted">
+    {% icon "list-outline" css_class="text-5xl block mx-auto mb-2" %}
+    <p class="mt-2">{% trans "No transactions found" %}</p>
+    {% if search or status_filter or gateway_filter %}
+    <p class="text-sm">{% trans "Try adjusting your filters." %}</p>
+    {% endif %}
+</div>
+{% endif %}

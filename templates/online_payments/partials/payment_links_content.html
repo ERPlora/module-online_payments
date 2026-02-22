@@ -1,0 +1,132 @@
+{% load i18n %}
+{% load djicons %}
+
+<div class="p-4">
+    <!-- Header with create button -->
+    <div class="flex justify-between items-center mb-4">
+        <div>
+            <input
+                type="text"
+                name="search"
+                value="{{ search }}"
+                placeholder="{% trans 'Search payment links...' %}"
+                class="input input-sm"
+                hx-get="{% url 'online_payments:payment_links' %}"
+                hx-trigger="keyup changed delay:400ms"
+                hx-target="#main-content-area"
+                hx-push-url="true">
+        </div>
+        <button class="btn color-primary"
+            hx-get="{% url 'online_payments:payment_link_create' %}"
+            hx-target="#main-content-area"
+            hx-push-url="true">
+            {% icon "add-circle-outline" %} {% trans "Create Payment Link" %}
+        </button>
+    </div>
+
+    <!-- Payment Links Grid -->
+    {% if payment_links %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for link in payment_links %}
+        <div class="card" x-data="{ showCopied: false }">
+            <div class="card-header">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="card-title">{{ link.title }}</h3>
+                        {% if link.description %}
+                        <p class="text-sm text-muted mt-1">{{ link.description|truncatechars:80 }}</p>
+                        {% endif %}
+                    </div>
+                    {% if link.is_available %}
+                    <span class="badge color-success badge-sm">{% trans "Active" %}</span>
+                    {% elif link.is_expired %}
+                    <span class="badge color-error badge-sm">{% trans "Expired" %}</span>
+                    {% elif not link.is_active %}
+                    <span class="badge badge-sm">{% trans "Inactive" %}</span>
+                    {% else %}
+                    <span class="badge color-warning badge-sm">{% trans "Used Up" %}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="text-2xl font-bold text-primary mb-3">
+                    {{ link.amount|floatformat:2 }} {{ link.currency }}
+                </div>
+
+                <div class="space-y-2 text-sm">
+                    {% if link.customer_email %}
+                    <div class="flex items-center gap-2 text-muted">
+                        {% icon "mail-outline" css_class="text-base" %}
+                        <span>{{ link.customer_email }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="flex items-center gap-2 text-muted">
+                        {% icon "repeat-outline" css_class="text-base" %}
+                        <span>{{ link.current_uses }}/{% if link.max_uses == 0 %}{% trans "unlimited" %}{% else %}{{ link.max_uses }}{% endif %} {% trans "uses" %}</span>
+                    </div>
+
+                    {% if link.expires_at %}
+                    <div class="flex items-center gap-2 text-muted">
+                        {% icon "time-outline" css_class="text-base" %}
+                        <span>{% trans "Expires" %}: {{ link.expires_at|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="flex items-center gap-2 text-muted">
+                        {% icon "calendar-outline" css_class="text-base" %}
+                        <span>{% trans "Created" %}: {{ link.created_at|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body border-t border-base-200 flex gap-2">
+                <!-- Copy Link -->
+                <button class="btn btn-sm btn-outline flex-1"
+                    @click="
+                        navigator.clipboard.writeText(window.location.origin + '{{ link.full_url }}');
+                        showCopied = true;
+                        setTimeout(() => showCopied = false, 2000);
+                    ">
+                    <span x-show="!showCopied">{% icon "copy-outline" %} {% trans "Copy Link" %}</span>
+                    <span x-show="showCopied" class="text-success">{% icon "checkmark-outline" %} {% trans "Copied!" %}</span>
+                </button>
+
+                {% if link.is_active %}
+                <!-- Deactivate -->
+                <button class="btn btn-sm btn-outline color-warning"
+                    hx-post="{% url 'online_payments:payment_link_deactivate' link.pk %}"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-confirm="{% trans 'Deactivate this payment link?' %}"
+                    hx-target="#main-content-area"
+                    hx-swap="innerHTML"
+                    hx-on::after-request="if(event.detail.successful) htmx.ajax('GET', '{% url 'online_payments:payment_links' %}', {target:'#main-content-area'})">
+                    {% icon "pause-outline" %}
+                </button>
+                {% endif %}
+
+                <!-- Delete -->
+                <button class="btn btn-sm btn-outline color-error"
+                    hx-post="{% url 'online_payments:payment_link_delete' link.pk %}"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-confirm="{% trans 'Delete this payment link?' %}"
+                    hx-on::after-request="if(event.detail.successful) htmx.ajax('GET', '{% url 'online_payments:payment_links' %}', {target:'#main-content-area'})">
+                    {% icon "trash-outline" %}
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12 text-muted">
+        {% icon "link-outline" css_class="text-5xl block mx-auto mb-2" %}
+        <p class="mt-2 text-lg">{% trans "No payment links yet" %}</p>
+        <p class="text-sm mb-4">{% trans "Create a payment link to collect payments from your customers." %}</p>
+        <button class="btn color-primary"
+            hx-get="{% url 'online_payments:payment_link_create' %}"
+            hx-target="#main-content-area"
+            hx-push-url="true">
+            {% icon "add-circle-outline" %} {% trans "Create First Payment Link" %}
+        </button>
+    </div>
+    {% endif %}
+</div>

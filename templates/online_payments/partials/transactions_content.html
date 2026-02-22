@@ -1,0 +1,82 @@
+{% load i18n %}
+{% load djicons %}
+
+<div class="p-4">
+    <div class="datatable datatable-bordered datatable-responsive">
+        <!-- Toolbar with filters -->
+        <div class="datatable-toolbar">
+            <div class="datatable-toolbar-start">
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search }}"
+                    placeholder="{% trans 'Search by ID, customer, or reference...' %}"
+                    class="input input-sm datatable-search"
+                    hx-get="{% url 'online_payments:transactions' %}"
+                    hx-trigger="keyup changed delay:400ms"
+                    hx-target="#transactions-table-container"
+                    hx-include="[name='status'],[name='gateway'],[name='date_from'],[name='date_to']"
+                    hx-push-url="true">
+                <input
+                    type="date"
+                    name="date_from"
+                    value="{{ date_from|default:'' }}"
+                    class="input input-sm"
+                    style="width: 150px"
+                    hx-get="{% url 'online_payments:transactions' %}"
+                    hx-trigger="change"
+                    hx-target="#transactions-table-container"
+                    hx-include="[name='search'],[name='status'],[name='gateway'],[name='date_to']"
+                    hx-push-url="true">
+                <input
+                    type="date"
+                    name="date_to"
+                    value="{{ date_to|default:'' }}"
+                    class="input input-sm"
+                    style="width: 150px"
+                    hx-get="{% url 'online_payments:transactions' %}"
+                    hx-trigger="change"
+                    hx-target="#transactions-table-container"
+                    hx-include="[name='search'],[name='status'],[name='gateway'],[name='date_from']"
+                    hx-push-url="true">
+            </div>
+            <div class="datatable-toolbar-end">
+                <select
+                    name="status"
+                    class="select select-sm"
+                    style="width: 160px"
+                    hx-get="{% url 'online_payments:transactions' %}"
+                    hx-trigger="change"
+                    hx-target="#transactions-table-container"
+                    hx-include="[name='search'],[name='gateway'],[name='date_from'],[name='date_to']"
+                    hx-push-url="true">
+                    <option value="">{% trans "All Statuses" %}</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>{% trans "Pending" %}</option>
+                    <option value="processing" {% if status_filter == 'processing' %}selected{% endif %}>{% trans "Processing" %}</option>
+                    <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>{% trans "Completed" %}</option>
+                    <option value="failed" {% if status_filter == 'failed' %}selected{% endif %}>{% trans "Failed" %}</option>
+                    <option value="refunded" {% if status_filter == 'refunded' %}selected{% endif %}>{% trans "Refunded" %}</option>
+                </select>
+                <select
+                    name="gateway"
+                    class="select select-sm"
+                    style="width: 140px"
+                    hx-get="{% url 'online_payments:transactions' %}"
+                    hx-trigger="change"
+                    hx-target="#transactions-table-container"
+                    hx-include="[name='search'],[name='status'],[name='date_from'],[name='date_to']"
+                    hx-push-url="true">
+                    <option value="">{% trans "All Gateways" %}</option>
+                    <option value="stripe" {% if gateway_filter == 'stripe' %}selected{% endif %}>Stripe</option>
+                    <option value="redsys" {% if gateway_filter == 'redsys' %}selected{% endif %}>Redsys</option>
+                    <option value="manual" {% if gateway_filter == 'manual' %}selected{% endif %}>{% trans "Manual" %}</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div id="transactions-table-container">
+            {% include "online_payments/partials/transactions_table_body.html" %}
+        </div>
+    </div>
+</div>

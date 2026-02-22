@@ -1,0 +1,166 @@
+{% load i18n %}
+{% load djicons %}
+
+<div class="p-4">
+    <!-- Gateway Status Banner -->
+    {% if gateway_settings.active_gateway == 'none' %}
+    <div class="callout callout-warning mb-4">
+        <div class="callout-icon">{% icon "warning-outline" %}</div>
+        <div class="callout-content">
+            <div class="callout-title">{% trans "No Payment Gateway Configured" %}</div>
+            <div class="callout-text">
+                {% trans "Configure a payment gateway in Settings to start accepting online payments." %}
+            </div>
+        </div>
+        <button class="btn btn-sm btn-outline"
+            hx-get="{% url 'online_payments:settings' %}"
+            hx-target="#main-content-area"
+            hx-push-url="true">
+            {% icon "settings-outline" %} {% trans "Configure" %}
+        </button>
+    </div>
+    {% else %}
+    <div class="callout callout-success mb-4">
+        <div class="callout-icon">{% icon "checkmark-circle-outline" %}</div>
+        <div class="callout-content">
+            <div class="callout-title">{% trans "Gateway Active" %}: {{ gateway_settings.get_active_gateway_display }}</div>
+            <div class="callout-text">{% trans "Accepting online payments" %}</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="card">
+            <div class="card-body p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center">
+                        {% icon "checkmark-circle-outline" css_class="text-2xl text-success" %}
+                    </div>
+                    <div>
+                        <div class="text-sm text-muted">{% trans "Total Collected" %}</div>
+                        <div class="text-2xl font-semibold">{{ total_collected|floatformat:2 }} {{ gateway_settings.currency }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center">
+                        {% icon "time-outline" css_class="text-2xl text-warning" %}
+                    </div>
+                    <div>
+                        <div class="text-sm text-muted">{% trans "Pending" %}</div>
+                        <div class="text-2xl font-semibold">{{ total_pending|floatformat:2 }} {{ gateway_settings.currency }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                        {% icon "cash-outline" css_class="text-2xl text-primary" %}
+                    </div>
+                    <div>
+                        <div class="text-sm text-muted">{% trans "Collected Today" %}</div>
+                        <div class="text-2xl font-semibold">{{ collected_today|floatformat:2 }} {{ gateway_settings.currency }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-error/10 rounded-xl flex items-center justify-center">
+                        {% icon "return-down-back-outline" css_class="text-2xl text-error" %}
+                    </div>
+                    <div>
+                        <div class="text-sm text-muted">{% trans "Total Refunded" %}</div>
+                        <div class="text-2xl font-semibold">{{ total_refunded|floatformat:2 }} {{ gateway_settings.currency }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="flex gap-3 mb-6">
+        <button class="btn color-primary"
+            hx-get="{% url 'online_payments:payment_link_create' %}"
+            hx-target="#main-content-area"
+            hx-push-url="true">
+            {% icon "add-circle-outline" %} {% trans "Create Payment Link" %}
+        </button>
+        <button class="btn btn-outline"
+            hx-get="{% url 'online_payments:transactions' %}"
+            hx-target="#main-content-area"
+            hx-push-url="true">
+            {% icon "list-outline" %} {% trans "View All Transactions" %}
+        </button>
+    </div>
+
+    <!-- Active Links Summary -->
+    <div class="card mb-6">
+        <div class="card-header">
+            <div class="flex justify-between items-center">
+                <h2 class="card-title">{% icon "link-outline" css_class="text-primary" %} {% trans "Active Payment Links" %}</h2>
+                <span class="badge color-primary">{{ active_links_count }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="card">
+        <div class="card-header">
+            <div class="flex justify-between items-center">
+                <h2 class="card-title">{% trans "Recent Transactions" %}</h2>
+                <button class="btn btn-ghost btn-sm"
+                    hx-get="{% url 'online_payments:transactions' %}"
+                    hx-target="#main-content-area"
+                    hx-push-url="true">
+                    {% trans "View all" %}
+                    {% icon "arrow-forward-outline" css_class="ml-1" %}
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if recent_transactions %}
+            <div class="space-y-3">
+                {% for txn in recent_transactions %}
+                <div class="flex items-center justify-between p-3 rounded-lg bg-base-100 cursor-pointer"
+                    hx-get="{% url 'online_payments:transaction_detail' txn.pk %}"
+                    hx-target="#main-content-area"
+                    hx-push-url="true">
+                    <div>
+                        <div class="font-medium">{{ txn.transaction_id }}</div>
+                        <div class="text-xs text-muted">
+                            {{ txn.created_at|date:"d/m/Y H:i" }}
+                            {% if txn.customer_name %} &mdash; {{ txn.customer_name }}{% endif %}
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-semibold {% if txn.status == 'completed' %}text-success{% elif txn.status == 'failed' %}text-error{% elif txn.status == 'pending' %}text-warning{% else %}text-muted{% endif %}">
+                            {{ txn.amount|floatformat:2 }} {{ txn.currency }}
+                        </div>
+                        <span class="badge badge-sm {% if txn.status == 'completed' %}color-success{% elif txn.status == 'failed' %}color-error{% elif txn.status == 'pending' %}color-warning{% elif txn.status == 'refunded' %}color-error{% else %}color-primary{% endif %}">
+                            {{ txn.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8 text-muted">
+                {% icon "card-outline" css_class="text-5xl block mx-auto mb-2" %}
+                <p class="mt-2">{% trans "No transactions yet" %}</p>
+                <p class="text-sm">{% trans "Transactions will appear here once payments are processed." %}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
