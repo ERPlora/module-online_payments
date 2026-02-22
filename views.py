@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from apps.accounts.decorators import login_required
+from apps.accounts.decorators import login_required, public_view
 from apps.core.htmx import htmx_view
 from apps.modules_runtime.navigation import with_module_nav
 
@@ -179,12 +179,11 @@ def refund(request, pk):
     """Process a refund for a transaction."""
     hub = _hub_id(request)
 
+    transaction = get_object_or_404(
+        PaymentTransaction,
+        id=pk, hub_id=hub, is_deleted=False,
+    )
     try:
-        transaction = get_object_or_404(
-            PaymentTransaction,
-            id=pk, hub_id=hub, is_deleted=False,
-        )
-
         if transaction.status not in ('completed', 'partially_refunded'):
             return JsonResponse({
                 'success': False,
@@ -281,11 +280,11 @@ def payment_link_deactivate(request, pk):
     """Deactivate a payment link."""
     hub = _hub_id(request)
 
+    link = get_object_or_404(
+        PaymentLink,
+        id=pk, hub_id=hub, is_deleted=False,
+    )
     try:
-        link = get_object_or_404(
-            PaymentLink,
-            id=pk, hub_id=hub, is_deleted=False,
-        )
         link.is_active = False
         link.save(update_fields=['is_active', 'updated_at'])
 
@@ -300,11 +299,11 @@ def payment_link_delete(request, pk):
     """Soft delete a payment link."""
     hub = _hub_id(request)
 
+    link = get_object_or_404(
+        PaymentLink,
+        id=pk, hub_id=hub, is_deleted=False,
+    )
     try:
-        link = get_object_or_404(
-            PaymentLink,
-            id=pk, hub_id=hub, is_deleted=False,
-        )
         link.delete()
 
         return JsonResponse({'success': True})
@@ -317,6 +316,7 @@ def payment_link_delete(request, pk):
 # ============================================================================
 
 @require_http_methods(["GET"])
+@public_view
 def checkout(request, slug):
     """Public checkout page for a payment link. No login required."""
     link = get_object_or_404(
@@ -432,6 +432,7 @@ def api_create_session(request):
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@public_view
 def api_webhook(request):
     """
     Webhook handler for payment gateway notifications.
@@ -473,6 +474,7 @@ def _handle_stripe_webhook(request, body):
     if event_type == 'checkout.session.completed':
         transaction.gateway_reference = data.get('payment_intent', '')
         transaction.payment_method_type = data.get('payment_method_types', ['card'])[0]
+        transaction.save(update_fields=['gateway_reference', 'payment_method_type', 'updated_at'])
         transaction.mark_completed()
 
         # Increment payment link usage if applicable
