@@ -1,0 +1,562 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-24 23:58+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+msgid "Online Payments"
+msgstr "Pagos online"
+
+msgid "Merchant code"
+msgstr "Código de comerciante"
+
+msgid "Secret key"
+msgstr "Clave secreta"
+
+msgid "email@example.com"
+msgstr "email@ejemplo.com"
+
+msgid "Payment title"
+msgstr "Título del pago"
+
+msgid "Optional description"
+msgstr "Descripción opcional"
+
+msgid "customer@example.com"
+msgstr "cliente@ejemplo.com"
+
+msgid "1 (0 = unlimited)"
+msgstr "1 (0 = ilimitado)"
+
+msgid "None"
+msgstr "Ninguno"
+
+msgid "Stripe"
+msgstr "Stripe"
+
+msgid "Redsys"
+msgstr "Redsys"
+
+msgid "Manual"
+msgstr "Manual"
+
+msgid "Test"
+msgstr "Prueba"
+
+msgid "Production"
+msgstr "Producción"
+
+msgid "Active Gateway"
+msgstr "Pasarela activa"
+
+msgid "Stripe Public Key"
+msgstr "Clave pública de Stripe"
+
+msgid "Stripe Secret Key"
+msgstr "Clave secreta de Stripe"
+
+msgid "Stripe Webhook Secret"
+msgstr "Secreto del webhook de Stripe"
+
+msgid "Redsys Merchant Code"
+msgstr "Código de comerciante de Redsys"
+
+msgid "Redsys Secret Key"
+msgstr "Clave secreta de Redsys"
+
+msgid "Redsys Terminal"
+msgstr "Terminal de Redsys"
+
+msgid "Redsys Environment"
+msgstr "Entorno de Redsys"
+
+msgid "Currency"
+msgstr "Moneda"
+
+msgid "Require Deposit"
+msgstr "Requerir depósito"
+
+msgid "Require a deposit for appointments and orders."
+msgstr "Requerir un depósito para citas y pedidos."
+
+msgid "Deposit Percentage"
+msgstr "Porcentaje de depósito"
+
+msgid "Percentage of total to collect as deposit."
+msgstr "Porcentaje del total a cobrar como depósito."
+
+msgid "Success URL"
+msgstr "URL de éxito"
+
+msgid "URL to redirect after successful payment."
+msgstr "URL de redirección tras pago exitoso."
+
+msgid "Cancel URL"
+msgstr "URL de cancelación"
+
+msgid "URL to redirect after cancelled payment."
+msgstr "URL de redirección tras pago cancelado."
+
+msgid "Notification Email"
+msgstr "Email de notificación"
+
+msgid "Email address for payment notifications."
+msgstr "Dirección de email para notificaciones de pago."
+
+msgid "Payment Gateway Settings"
+msgstr "Ajustes de pasarela de pago"
+
+msgid "Pending"
+msgstr "Pendiente"
+
+msgid "Processing"
+msgstr "Procesando"
+
+msgid "Completed"
+msgstr "Completado"
+
+msgid "Failed"
+msgstr "Fallido"
+
+msgid "Refunded"
+msgstr "Reembolsado"
+
+msgid "Partially Refunded"
+msgstr "Parcialmente reembolsado"
+
+msgid "Transaction ID"
+msgstr "ID de transacción"
+
+msgid "Internal unique transaction identifier."
+msgstr "Identificador interno único de transacción."
+
+msgid "Gateway"
+msgstr "Pasarela"
+
+msgid "Payment gateway used for this transaction."
+msgstr "Pasarela de pago utilizada para esta transacción."
+
+msgid "Amount"
+msgstr "Importe"
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Gateway Reference"
+msgstr "Referencia de pasarela"
+
+msgid "Gateway-specific transaction ID."
+msgstr "ID de transacción específico de la pasarela."
+
+msgid "Payment Method Type"
+msgstr "Tipo de método de pago"
+
+msgid "Payment method type (card/bizum/transfer)."
+msgstr "Tipo de método de pago (tarjeta/bizum/transferencia)."
+
+msgid "Customer Email"
+msgstr "Email del cliente"
+
+msgid "Customer Name"
+msgstr "Nombre del cliente"
+
+msgid "Description"
+msgstr "Descripción"
+
+msgid "Source Type"
+msgstr "Tipo de origen"
+
+msgid "Source type (appointment/sale/invoice/link)."
+msgstr "Tipo de origen (cita/venta/factura/enlace)."
+
+msgid "Source ID"
+msgstr "ID de origen"
+
+msgid "Metadata"
+msgstr "Metadatos"
+
+msgid "Error Message"
+msgstr "Mensaje de error"
+
+msgid "Refund Amount"
+msgstr "Importe de reembolso"
+
+msgid "Refunded At"
+msgstr "Reembolsado el"
+
+msgid "Completed At"
+msgstr "Completado el"
+
+msgid "Payment Transaction"
+msgstr "Transacción de pago"
+
+msgid "Payment Transactions"
+msgstr "Transacciones de pago"
+
+msgid "Refund amount must be positive."
+msgstr "El importe del reembolso debe ser positivo."
+
+#, python-format
+msgid "Refund amount (%(amount)s) exceeds maximum refundable (%(max)s)."
+msgstr ""
+"El importe del reembolso (%(amount)s) supera el máximo reembolsable "
+"(%(max)s)."
+
+msgid "Title"
+msgstr "Título"
+
+msgid "Slug"
+msgstr "Slug"
+
+msgid "URL-friendly identifier for the payment link."
+msgstr "Identificador amigable para URL del enlace de pago."
+
+msgid "Active"
+msgstr "Activo"
+
+msgid "Expires At"
+msgstr "Expira el"
+
+msgid "Max Uses"
+msgstr "Usos máximos"
+
+msgid "Maximum number of times this link can be used (0 = unlimited)."
+msgstr "Número máximo de veces que se puede usar este enlace (0 = ilimitado)."
+
+msgid "Current Uses"
+msgstr "Usos actuales"
+
+msgid "Payment Link"
+msgstr "Enlace de pago"
+
+msgid "Payment Links"
+msgstr "Enlaces de pago"
+
+msgid "Payment gateway integration for online and remote payments"
+msgstr "Integración de pasarela de pago para pagos online y remotos"
+
+msgid "Dashboard"
+msgstr "Panel"
+
+msgid "Transactions"
+msgstr "Transacciones"
+
+msgid "Settings"
+msgstr "Ajustes"
+
+msgid "Payment"
+msgstr "Pago"
+
+msgid "Pay with Stripe"
+msgstr "Pagar con Stripe"
+
+msgid "Pay with Card"
+msgstr "Pagar con tarjeta"
+
+msgid "Manual Payment"
+msgstr "Pago manual"
+
+msgid "Please contact the business to arrange payment."
+msgstr "Por favor, contacta con el negocio para organizar el pago."
+
+msgid "Payment Unavailable"
+msgstr "Pago no disponible"
+
+msgid "Online payments are not currently configured."
+msgstr "Los pagos online no están configurados actualmente."
+
+msgid "Secure payment processing"
+msgstr "Procesamiento seguro de pagos"
+
+msgid "Payment Link Unavailable"
+msgstr "Enlace de pago no disponible"
+
+msgid "This payment link has expired."
+msgstr "Este enlace de pago ha expirado."
+
+msgid "This payment link has been deactivated."
+msgstr "Este enlace de pago ha sido desactivado."
+
+msgid "This payment link has reached its maximum number of uses."
+msgstr "Este enlace de pago ha alcanzado su número máximo de usos."
+
+msgid "Please contact the business for assistance."
+msgstr "Por favor, contacta con el negocio para obtener ayuda."
+
+msgid "No Payment Gateway Configured"
+msgstr "No hay pasarela de pago configurada"
+
+msgid ""
+"Configure a payment gateway in Settings to start accepting online payments."
+msgstr ""
+"Configura una pasarela de pago en Ajustes para empezar a aceptar pagos "
+"online."
+
+msgid "Configure"
+msgstr "Configurar"
+
+msgid "Gateway Active"
+msgstr "Pasarela activa"
+
+msgid "Accepting online payments"
+msgstr "Aceptando pagos online"
+
+msgid "Total Collected"
+msgstr "Total cobrado"
+
+msgid "Collected Today"
+msgstr "Cobrado hoy"
+
+msgid "Total Refunded"
+msgstr "Total reembolsado"
+
+msgid "Create Payment Link"
+msgstr "Crear enlace de pago"
+
+msgid "View All Transactions"
+msgstr "Ver todas las transacciones"
+
+msgid "Active Payment Links"
+msgstr "Enlaces de pago activos"
+
+msgid "Recent Transactions"
+msgstr "Transacciones recientes"
+
+msgid "View all"
+msgstr "Ver todo"
+
+msgid "No transactions yet"
+msgstr "Sin transacciones aún"
+
+msgid "Transactions will appear here once payments are processed."
+msgstr "Las transacciones aparecerán aquí una vez que se procesen los pagos."
+
+msgid "Create a shareable link for your customer to make a payment."
+msgstr "Crea un enlace compartible para que tu cliente realice un pago."
+
+msgid "Optional. Pre-fill the customer email on checkout."
+msgstr "Opcional. Rellenar previamente el email del cliente en el checkout."
+
+msgid "Optional. Leave empty for no expiration."
+msgstr "Opcional. Dejar vacío sin expiración."
+
+msgid "Set to 0 for unlimited uses."
+msgstr "Establecer a 0 para usos ilimitados."
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Search payment links..."
+msgstr "Buscar enlaces de pago..."
+
+msgid "Expired"
+msgstr "Expirado"
+
+msgid "Inactive"
+msgstr "Inactivo"
+
+msgid "Used Up"
+msgstr "Agotado"
+
+msgid "unlimited"
+msgstr "ilimitado"
+
+msgid "uses"
+msgstr "usos"
+
+msgid "Expires"
+msgstr "Expira"
+
+msgid "Created"
+msgstr "Creado"
+
+msgid "Copy Link"
+msgstr "Copiar enlace"
+
+msgid "Copied!"
+msgstr "¡Copiado!"
+
+msgid "Deactivate this payment link?"
+msgstr "¿Desactivar este enlace de pago?"
+
+msgid "Delete this payment link?"
+msgstr "¿Eliminar este enlace de pago?"
+
+msgid "No payment links yet"
+msgstr "Sin enlaces de pago aún"
+
+msgid "Create a payment link to collect payments from your customers."
+msgstr "Crea un enlace de pago para cobrar a tus clientes."
+
+msgid "Create First Payment Link"
+msgstr "Crear primer enlace de pago"
+
+msgid "Settings saved"
+msgstr "Ajustes guardados"
+
+msgid "Error saving settings"
+msgstr "Error al guardar ajustes"
+
+msgid "Payment Gateway"
+msgstr "Pasarela de pago"
+
+msgid "Select and configure your payment provider"
+msgstr "Selecciona y configura tu proveedor de pago"
+
+msgid "None (disabled)"
+msgstr "Ninguno (deshabilitado)"
+
+msgid "Spain"
+msgstr "España"
+
+msgid "Stripe Configuration"
+msgstr "Configuración de Stripe"
+
+msgid "Public Key"
+msgstr "Clave pública"
+
+msgid "Secret Key"
+msgstr "Clave secreta"
+
+msgid "Leave empty to keep current value"
+msgstr "Dejar vacío para mantener el valor actual"
+
+msgid "Webhook Secret"
+msgstr "Secreto del webhook"
+
+msgid "Redsys Configuration"
+msgstr "Configuración de Redsys"
+
+msgid "Merchant Code"
+msgstr "Código de comerciante"
+
+msgid "Terminal"
+msgstr "Terminal"
+
+msgid "Environment"
+msgstr "Entorno"
+
+msgid "General Settings"
+msgstr "Ajustes generales"
+
+msgid "Require a deposit for appointments and orders"
+msgstr "Requerir un depósito para citas y pedidos"
+
+msgid "Percentage of total to collect as deposit"
+msgstr "Porcentaje del total a cobrar como depósito"
+
+msgid "Redirect URLs"
+msgstr "URLs de redirección"
+
+msgid "Redirect after successful payment"
+msgstr "Redireccionar después de pago exitoso"
+
+msgid "Redirect after cancelled payment"
+msgstr "Redireccionar después de pago cancelado"
+
+msgid "Notifications"
+msgstr "Notificaciones"
+
+msgid "Receive email notifications for payment events"
+msgstr "Recibir notificaciones por email de eventos de pago"
+
+msgid "Save Settings"
+msgstr "Guardar ajustes"
+
+msgid "Transaction"
+msgstr "Transacción"
+
+msgid "Customer"
+msgstr "Cliente"
+
+msgid "Source"
+msgstr "Origen"
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Refund Details"
+msgstr "Detalles del reembolso"
+
+msgid "Refunded Amount"
+msgstr "Importe reembolsado"
+
+msgid "Remaining"
+msgstr "Restante"
+
+msgid "Back to Transactions"
+msgstr "Volver a transacciones"
+
+msgid "Refund"
+msgstr "Reembolso"
+
+msgid "Process Refund"
+msgstr "Procesar reembolso"
+
+msgid "Enter the amount to refund for transaction"
+msgstr "Introduce el importe a reembolsar para la transacción"
+
+msgid "Refund processed"
+msgstr "Reembolso procesado"
+
+msgid "Search by ID, customer, or reference..."
+msgstr "Buscar por ID, cliente o referencia..."
+
+msgid "All Statuses"
+msgstr "Todos los estados"
+
+msgid "All Gateways"
+msgstr "Todas las pasarelas"
+
+msgid "Date"
+msgstr "Fecha"
+
+msgid "Actions"
+msgstr "Acciones"
+
+msgid "Page"
+msgstr "Página"
+
+msgid "of"
+msgstr "de"
+
+msgid "No transactions found"
+msgstr "No se encontraron transacciones"
+
+msgid "Try adjusting your filters."
+msgstr "Prueba a ajustar tus filtros."
+
+msgid "Only completed transactions can be refunded."
+msgstr "Solo las transacciones completadas se pueden reembolsar."
+
+msgid "Amount must be greater than zero."
+msgstr "El importe debe ser mayor que cero."
+
+msgid "No payment gateway configured."
+msgstr "No hay pasarela de pago configurada."
+
+msgid "Stripe session created. Integrate Stripe.js for checkout."
+msgstr "Sesión de Stripe creada. Integrar Stripe.js para el checkout."
+
+msgid "Redsys session created. Redirect to Redsys payment form."
+msgstr "Sesión de Redsys creada. Redirigir al formulario de pago de Redsys."
+
+msgid "Manual payment pending confirmation."
+msgstr "Pago manual pendiente de confirmación."
+
+msgid "Invalid JSON"
+msgstr "JSON inválido"

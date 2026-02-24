@@ -450,7 +450,7 @@ def api_webhook(request):
             return JsonResponse({'error': 'Unknown gateway'}, status=400)
 
     except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        return JsonResponse({'error': _('Invalid JSON')}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
