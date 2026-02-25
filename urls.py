@@ -7,6 +7,10 @@ urlpatterns = [
     # Dashboard
     path('', views.dashboard, name='dashboard'),
 
+    # Navigation tab aliases
+    path('payment_links/', views.payment_links, name='payment_links'),
+
+
     # Transactions
     path('transactions/', views.transactions, name='transactions'),
     path('transactions/<uuid:pk>/', views.transaction_detail, name='transaction_detail'),
