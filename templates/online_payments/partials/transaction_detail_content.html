@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load djicons %}
+<div data-back-url="{% url 'online_payments:transactions' %}" hidden></div>
 
 <div class="p-4" x-data="{ showRefundModal: false, refundAmount: '', refunding: false }">
     <!-- Transaction Header Card -->
@@ -125,15 +126,6 @@
 
     <!-- Action Buttons -->
     <div class="flex gap-3 mt-4">
-        <button
-            class="btn btn-outline"
-            hx-get="{% url 'online_payments:transactions' %}"
-            hx-target="#main-content-area"
-            hx-push-url="true">
-            {% icon "arrow-back-outline" css_class="mr-2" %}
-            {% trans "Back to Transactions" %}
-        </button>
-
         {% if transaction.status == 'completed' or transaction.status == 'partially_refunded' %}
         <button
             class="btn btn-outline color-error"
