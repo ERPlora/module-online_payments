@@ -1,9 +1,8 @@
 {% load i18n %}
 {% load djicons %}
 
-<script>
-function onlinePaymentsSettingsApp() {
-    return {
+{% csrf_token %}
+<div x-data="{
         activeGateway: '{{ config.active_gateway }}',
         saving: false,
 
@@ -23,7 +22,7 @@ function onlinePaymentsSettingsApp() {
             data.require_deposit = form.querySelector('[name=require_deposit]')?.checked || false;
 
             try {
-                const response = await fetch('{% url "online_payments:settings_save" %}', {
+                const response = await fetch('{% url 'online_payments:settings_save' %}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -35,31 +34,18 @@ function onlinePaymentsSettingsApp() {
                 const result = await response.json();
 
                 if (response.ok && result.success) {
-                    this.showToast('{% trans "Settings saved" %}', 'success');
+                    window.showToast('{% trans 'Settings saved' %}', 'success');
                 } else {
-                    throw new Error(result.error || '{% trans "Error saving settings" %}');
+                    throw new Error(result.error || '{% trans 'Error saving settings' %}');
                 }
             } catch (error) {
                 console.error('[OnlinePayments Settings] Error:', error);
-                this.showToast(error.message || '{% trans "Error saving settings" %}', 'error');
+                window.showToast(error.message || '{% trans 'Error saving settings' %}', 'error');
             } finally {
                 this.saving = false;
             }
         },
-
-        showToast(message, type = 'primary') {
-            if (window.UX && window.UX.toast) {
-                window.UX.toast(message, { type: type });
-            } else {
-                console.log('[Toast]', type, message);
-            }
-        }
-    }
-}
-</script>
-
-{% csrf_token %}
-<div x-data="onlinePaymentsSettingsApp()" x-init="init()" class="p-4">
+    }" class="p-4">
 
     <form x-ref="settingsForm" @submit.prevent="saveSettings()">
         <!-- Gateway Selection -->
