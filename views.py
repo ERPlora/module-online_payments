@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from apps.accounts.decorators import login_required, public_view
+from apps.accounts.decorators import login_required, public_view, permission_required
 from apps.core.htmx import htmx_view
 from apps.modules_runtime.navigation import with_module_nav
 
@@ -548,6 +548,7 @@ def _handle_redsys_webhook(request, body):
     'online_payments/pages/settings.html',
     'online_payments/partials/settings_content.html',
 )
+@permission_required('online_payments.manage_settings')
 def settings_view(request):
     hub = _hub_id(request)
     settings = PaymentGatewaySettings.get_settings(hub)
@@ -561,6 +562,7 @@ def settings_view(request):
 
 @require_http_methods(["POST"])
 @login_required
+@permission_required('online_payments.manage_settings')
 def settings_save(request):
     """Save payment gateway settings."""
     hub = _hub_id(request)
