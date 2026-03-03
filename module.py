@@ -32,3 +32,19 @@ PERMISSIONS = [
     'online_payments.delete_payment_link',
     'online_payments.manage_settings',
 ]
+
+ROLE_PERMISSIONS = {
+    "admin": ["*"],
+    "manager": [
+        "add_payment_link",
+        "add_transaction",
+        "refund_transaction",
+        "view_payment_link",
+        "view_transaction",
+    ],
+    "employee": [
+        "add_transaction",
+        "view_payment_link",
+        "view_transaction",
+    ],
+}
