@@ -15,8 +15,8 @@
 
             const form = this.$refs.settingsForm;
             const formData = new FormData(form);
-            const data = {};
-            formData.forEach((value, key) => { data[key] = value; });
+            const data = {},
+            formData.forEach((value, key) => { data[key] = value; },
 
             // Ensure boolean fields are set
             data.require_deposit = form.querySelector('[name=require_deposit]')?.checked || false;
@@ -29,7 +29,7 @@
                         'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                     },
                     body: JSON.stringify(data)
-                });
+                },
 
                 const result = await response.json();
 
@@ -44,8 +44,7 @@
             } finally {
                 this.saving = false;
             }
-        },
-    }" class="p-4">
+        }}" class="p-4">
 
     <form x-ref="settingsForm" @submit.prevent="saveSettings()">
         <!-- Gateway Selection -->

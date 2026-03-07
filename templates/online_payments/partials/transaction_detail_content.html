@@ -168,11 +168,11 @@
                         .then(r => r.json())
                         .then(data => {
                             if (data.success) {
-                                if (window.UX && window.UX.toast) window.UX.toast('{% trans "Refund processed" %}', { type: 'success' });
+                                if (window.UX && window.UX.toast) window.UX.toast('{% trans "Refund processed" %}', { type: 'success' },
                                 showRefundModal = false;
-                                htmx.ajax('GET', window.location.href, { target: '#main-content-area' });
+                                htmx.ajax('GET', window.location.href, { target: '#main-content-area' },
                             } else {
-                                if (window.UX && window.UX.toast) window.UX.toast(data.error, { type: 'error' });
+                                if (window.UX && window.UX.toast) window.UX.toast(data.error, { type: 'error' },
                             }
                             refunding = false;
                         })
