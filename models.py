@@ -133,8 +133,14 @@ class PaymentGatewaySettings(HubBaseModel):
     @classmethod
     def get_settings(cls, hub_id):
         """Get or create settings singleton for the given hub."""
-        settings, _ = cls.all_objects.get_or_create(hub_id=hub_id)
-        return settings
+        try:
+            return cls.all_objects.get(hub_id=hub_id)
+        except cls.DoesNotExist:
+            from django.db import IntegrityError
+            try:
+                return cls.all_objects.create(hub_id=hub_id)
+            except IntegrityError:
+                return cls.all_objects.get(hub_id=hub_id)
 
 
 # ---------------------------------------------------------------------------
